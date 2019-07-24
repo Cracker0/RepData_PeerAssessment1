@@ -1,12 +1,6 @@
-
-```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE)
 library(ggplot2)
-```
 
-#Loading data
-
-```{r Loading data}
 activity <- read.csv("activity.csv")
 
 activity$date <- as.POSIXct(activity$date, "%Y-%m-%d")
@@ -14,12 +8,8 @@ weekday <- weekdays(activity$date)
 activity <- cbind(activity,weekday)
 
 summary(activity)
-```
 
 #1 Steps taken per day
-#1 Mean and median of the total number of steps taken per day
-```{r activity details}
-
 activity_total_steps <- with(activity, aggregate(steps, by = list(date), FUN = sum, na.rm = TRUE))
 names(activity_total_steps) <- c("date", "steps")
 hist(activity_total_steps$steps, 
@@ -29,15 +19,11 @@ hist(activity_total_steps$steps,
      ylim = c(0,20), 
      breaks = seq(0,25000, by=2500))
 
-
+#1 Mean and median of the total number of steps taken per day
 mean(activity_total_steps$steps)
 median(activity_total_steps$steps)
-```
 
 #2 What is the average daily activity pattern?
-#2 5-minute interval, on average across all the days in the dataset, the maximum number of steps
-```{r steps mean}
-
 average_daily_activity <- aggregate(activity$steps, by=list(activity$interval), FUN=mean, na.rm=TRUE)
 names(average_daily_activity) <- c("interval", "mean")
 plot(average_daily_activity$interval, average_daily_activity$mean, 
@@ -48,13 +34,10 @@ plot(average_daily_activity$interval, average_daily_activity$mean,
      ylab="Average number of steps", 
      main="Average number of steps per intervals")
 
-
+#2 5-minute interval, on average across all the days in the dataset, the maximum number of steps
 average_daily_activity[which.max(average_daily_activity$mean), ]$interval
-```
 
 #3 Inputing missing values
-```{r inputting missing values}
-
 sum(is.na(activity$steps))
 imputed_steps <- average_daily_activity$mean[match(activity$interval, average_daily_activity$interval)]
 activity_imputed <- transform(activity, 
@@ -70,12 +53,8 @@ hist(total_steps_imputed$daily_steps,
      ylim = c(0,30), 
      main = "Total number of steps taken each day", 
      breaks = seq(0,25000,by=2500))
-```
-
 
 #Are there differences in activity patterns between weekdays and weekends?
-```{r difference in activity pattern}
-
 activity$date <- as.Date(strptime(activity$date, format="%Y-%m-%d"))
 activity$datetype <- sapply(activity$date, function(x) {
      if (weekdays(x) == "Sábado" | weekdays(x) =="Domingo") 
@@ -90,6 +69,3 @@ plot<- ggplot(activity_by_date, aes(x = interval , y = steps, color = datetype))
      labs(title = "Average daily steps by type of date", x = "Interval", y = "Average number of steps") +
      facet_wrap(~datetype, ncol = 1, nrow=2)
 print(plot)
-
-```
-
